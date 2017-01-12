@@ -31,20 +31,38 @@ void InitCardManagerInfo()
 */
 EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned int charge)
 {
-    if(g_CardNumNow < MAX_CARD_NUM)
+	static unsigned int s_IndexNow = 0;
+	//索引ID未超过99
+    if(s_IndexNow < MAX_CARD_NUM)
 	{
 		cardNo = g_CardNumNow;
 		G_cardList[cardNo].balance = charge;
 		G_cardList[cardNo].usrFlag = true;
 		G_cardList[cardNo].enCard = enCard;
 		++g_CardNumNow;
+		++s_IndexNow;
 		return EN_RETURN_SUCC;
 	}
-	if(g_CardNumNow == MAX_CARD_NUM)
+	//索引ID超过99，但是卡片数量没有超过100
+	else if(s_IndexNow >= MAX_CARD_NUM && g_CardNumNow < MAX_CARD_NUM)
+	{
+		for(int i=0;i<MAX_CARD_NUM;++i)
+		{
+			if(false == G_cardList[i].usrFlag)
+			{
+				cardNo = i;
+				G_cardList[cardNo].balance = charge;
+				G_cardList[cardNo].usrFlag = true;
+				G_cardList[cardNo].enCard = enCard;
+				++g_CardNumNow;
+			}
+		}
+		return EN_RETURN_SUCC;
+	}
+	else
 	{
 		return EN_RETURN_CARD_OVERLOW;
 	}
-    return EN_RETURN_SUCC;
 }
 
 /*
@@ -55,6 +73,8 @@ EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned in
 */
 EN_RETURN_CODE RechargeCard(unsigned int cardNo, unsigned int recharge)
 {
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+		return EN_RETURN_BUTT;
 	if(G_cardList[cardNo].balance + recharge > 999)
 		return EN_RETURN_BUTT;
 	G_cardList[cardNo].balance += recharge;
@@ -70,6 +90,8 @@ EN_RETURN_CODE RechargeCard(unsigned int cardNo, unsigned int recharge)
 */
 EN_RETURN_CODE GetCardInfo(unsigned int cardNo, unsigned int &balance, EN_CARD_TYPE &enCard)
 {
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+		return EN_RETURN_INVALID_CARD;
     balance = G_cardList[cardNo].balance;
     return EN_RETURN_SUCC;
 }
@@ -82,6 +104,8 @@ EN_RETURN_CODE GetCardInfo(unsigned int cardNo, unsigned int &balance, EN_CARD_T
 */
 EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int deductPrice, unsigned int &balance)
 {
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+		return EN_RETURN_INVALID_CARD;
     if(G_cardList[cardNo].balance - deductPrice < 0)
 		return EN_RETURN_BALANCE_NOT_ENOUGH;
 	G_cardList[cardNo].balance -= deductPrice;
@@ -96,6 +120,8 @@ EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int
 */
 int DeleteCard(unsigned int cardNo)
 {
+	if(false == G_cardList[cardNo].usrFlag)
+		return -1;
 	G_cardList[cardNo].balance = 0;
 	G_cardList[cardNo].enCard = EN_CARD_TYPE_BUTT;
 	G_cardList[cardNo].usrFlag = false;
