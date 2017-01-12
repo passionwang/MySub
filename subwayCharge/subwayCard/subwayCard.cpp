@@ -31,7 +31,7 @@ void InitCardManagerInfo()
 */
 EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned int charge)
 {
-    if(g_CardNumNow < MAX_CARD_NUM-1)
+    if(g_CardNumNow < MAX_CARD_NUM)
 	{
 		cardNo = g_CardNumNow;
 		G_cardList[cardNo].balance = charge;
@@ -40,7 +40,7 @@ EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned in
 		++g_CardNumNow;
 		return EN_RETURN_SUCC;
 	}
-	if(g_CardNumNow == MAX_CARD_NUM-1)
+	if(g_CardNumNow == MAX_CARD_NUM)
 	{
 		return EN_RETURN_CARD_OVERLOW;
 	}
