@@ -25,11 +25,11 @@ void ProcCreateCardCmd(UN_CMD &unCmd, char returnStr[MAX_SEND_BUFFER_LENGTH])
 	 returnCode = GetCardType(unCmd.stCmdCreateCard.cardType,enCard);
 
 	 if(enCard == EN_CARD_TYPE_SINGLE || enCard == EN_CARD_TYPE_BUTT)
-	{
+	 {
 		returnCode = EN_RETURN_INPUT_INVALID_CARDTYPE;
 		GetOutputResultStr(EN_CMD_TYPE_CREATE_CARD, returnCode, 0, enCard, 0, returnStr);
 		return;
-	}
+	 }
 
     //°ì¿¨ 
 	unsigned int cardNo;

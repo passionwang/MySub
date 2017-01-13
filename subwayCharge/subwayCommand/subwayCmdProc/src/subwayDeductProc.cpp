@@ -65,8 +65,6 @@ void ProcDeductCmd(UN_CMD &unCmd, char returnStr[MAX_SEND_BUFFER_LENGTH])
         GetOutputResultStr(EN_CMD_TYPE_DEDUCT, returnCode, unCmd.stCmdDeduct.cardNo, enCard, balance, returnStr);
         return;
     }
-    //获得当前balance
-    GetCardInfo(unCmd.stCmdDeduct.cardNo,balance,enCard);
     //输出字符串
     if(balance < 20 && enCard != EN_CARD_TYPE_SINGLE)
     {
