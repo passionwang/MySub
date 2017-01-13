@@ -6,8 +6,8 @@
 #include "subwayCard.h"
 using namespace std;
 
-unsigned int g_CardNumNow = 0;
-unsigned int s_IndexNow = 0;
+unsigned int g_CardNumNow = 0;//当前开卡数量
+unsigned int s_IndexNow = 0;//当前最大索引
 ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
 /*
 @ 初始化所有卡信息
@@ -132,7 +132,6 @@ EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int
 		g_CardNumNow--;
 		balance=0;
 	}
-
     return EN_RETURN_SUCC;
 }
 
