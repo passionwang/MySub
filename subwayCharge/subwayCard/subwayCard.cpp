@@ -7,6 +7,7 @@
 using namespace std;
 
 unsigned int g_CardNumNow = 0;
+unsigned int s_IndexNow = 0;
 ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
 /*
 @ 初始化所有卡信息
@@ -14,11 +15,13 @@ ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
 */
 void InitCardManagerInfo()
 {
+    g_CardNumNow = 0;
+	s_IndexNow = 0;
     for(int i = 0; i < MAX_CARD_NUM; i++)
     {
 		G_cardList[i].balance = 0;
 		G_cardList[i].cardNo = i;
-		G_cardList[i].usrFlag = false;
+		G_cardList[i].usrFlag = 0;
 		G_cardList[i].enCard = EN_CARD_TYPE_BUTT;
     }
 }
@@ -31,13 +34,17 @@ void InitCardManagerInfo()
 */
 EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned int charge)
 {
-	static unsigned int s_IndexNow = 0;
+	
+    if(999 < charge)
+	{
+		return EN_RETURN_RECHARGE_OVERFLOW;
+	}
 	//索引ID未超过99
     if(s_IndexNow < MAX_CARD_NUM)
 	{
 		cardNo = g_CardNumNow;
 		G_cardList[cardNo].balance = charge;
-		G_cardList[cardNo].usrFlag = true;
+		G_cardList[cardNo].usrFlag = 1;
 		G_cardList[cardNo].enCard = enCard;
 		++g_CardNumNow;
 		++s_IndexNow;
@@ -48,11 +55,11 @@ EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned in
 	{
 		for(int i=0;i<MAX_CARD_NUM;++i)
 		{
-			if(false == G_cardList[i].usrFlag)
+			if(0 == G_cardList[i].usrFlag)
 			{
 				cardNo = i;
 				G_cardList[cardNo].balance = charge;
-				G_cardList[cardNo].usrFlag = true;
+				G_cardList[cardNo].usrFlag = 1;
 				G_cardList[cardNo].enCard = enCard;
 				++g_CardNumNow;
 			}
@@ -73,10 +80,14 @@ EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned in
 */
 EN_RETURN_CODE RechargeCard(unsigned int cardNo, unsigned int recharge)
 {
-	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
-		return EN_RETURN_BUTT;
+    if(cardNo >= MAX_CARD_NUM)
+        return EN_RETURN_INVALID_CARD;
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE)
+		return EN_RETURN_SINGLE_CARD_CANNOT_RECHARGE;
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+		return EN_RETURN_INVALID_CARD;
 	if(G_cardList[cardNo].balance + recharge > 999)
-		return EN_RETURN_BUTT;
+		return EN_RETURN_RECHARGE_OVERFLOW;
 	G_cardList[cardNo].balance += recharge;
     return EN_RETURN_SUCC;
 }
@@ -90,9 +101,12 @@ EN_RETURN_CODE RechargeCard(unsigned int cardNo, unsigned int recharge)
 */
 EN_RETURN_CODE GetCardInfo(unsigned int cardNo, unsigned int &balance, EN_CARD_TYPE &enCard)
 {
-	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+    if(cardNo >= MAX_CARD_NUM)
+        return EN_RETURN_INVALID_CARD;
+	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
 		return EN_RETURN_INVALID_CARD;
     balance = G_cardList[cardNo].balance;
+    enCard = G_cardList[cardNo].enCard;
     return EN_RETURN_SUCC;
 }
 
@@ -104,11 +118,21 @@ EN_RETURN_CODE GetCardInfo(unsigned int cardNo, unsigned int &balance, EN_CARD_T
 */
 EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int deductPrice, unsigned int &balance)
 {
-	if(G_cardList[cardNo].enCard == EN_CARD_TYPE_SINGLE || G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
+    if(cardNo >= MAX_CARD_NUM)
+        return EN_RETURN_INVALID_CARD;
+    if(G_cardList[cardNo].enCard == EN_CARD_TYPE_BUTT)
 		return EN_RETURN_INVALID_CARD;
-    if(G_cardList[cardNo].balance - deductPrice < 0)
-		return EN_RETURN_BALANCE_NOT_ENOUGH;
-	G_cardList[cardNo].balance -= deductPrice;
+    if(G_cardList[cardNo].balance < deductPrice)
+        return EN_RETURN_BALANCE_NOT_ENOUGH;
+    G_cardList[cardNo].balance = G_cardList[cardNo].balance - deductPrice;
+    if(enCard == EN_CARD_TYPE_SINGLE) {
+		G_cardList[cardNo].enCard = EN_CARD_TYPE_BUTT;
+		G_cardList[cardNo].balance = 0;
+		G_cardList[cardNo].usrFlag = false;
+		g_CardNumNow--;
+		balance=0;
+	}
+
     return EN_RETURN_SUCC;
 }
 
@@ -120,11 +144,13 @@ EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int
 */
 int DeleteCard(unsigned int cardNo)
 {
-	if(false == G_cardList[cardNo].usrFlag)
+    if(cardNo >= MAX_CARD_NUM)
+        return EN_RETURN_INVALID_CARD;
+	if(0 == G_cardList[cardNo].usrFlag)
 		return -1;
 	G_cardList[cardNo].balance = 0;
 	G_cardList[cardNo].enCard = EN_CARD_TYPE_BUTT;
-	G_cardList[cardNo].usrFlag = false;
+	G_cardList[cardNo].usrFlag = 0;
     return 0;
 }
 
@@ -140,19 +166,14 @@ char* GetCardTypeStr(EN_CARD_TYPE enCard)
 	{
 	case EN_CARD_TYPE_SINGLE:
 		return "单程卡";
-		break;
 	case EN_CARD_TYPE_ELDER:
 		return "老年卡";
-		break;
 	case EN_CARD_TYPE_NOMAL:
 		return "普通卡";
-		break;
 	case EN_CARD_TYPE_BUTT:
-		return "卡卡";
-		break;
+		return "未知卡类型";
 	default:
 		return NULL;
-			break;
 	}
 }
 
@@ -164,7 +185,25 @@ char* GetCardTypeStr(EN_CARD_TYPE enCard)
 */
 EN_RETURN_CODE GetCardType(char cardType[], EN_CARD_TYPE &enCard)
 {
-    
-
-    return EN_RETURN_SUCC;
+    if(cardType[0]=='a')
+	{
+		enCard=EN_CARD_TYPE_SINGLE;
+		return EN_RETURN_SUCC;
+	}
+	else if(cardType[0]=='b')
+	{
+		enCard=EN_CARD_TYPE_ELDER;
+		return EN_RETURN_SUCC;
+	}
+	else if(cardType[0]=='c')
+	{
+		enCard=EN_CARD_TYPE_NOMAL;
+		return EN_RETURN_SUCC;
+	}
+	else
+	{
+		enCard=EN_CARD_TYPE_BUTT;
+		return EN_RETURN_SUCC;
+	}
+    return EN_RETURN_INPUT_INVALID_CARDTYPE;
 }

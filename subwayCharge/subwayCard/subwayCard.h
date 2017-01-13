@@ -1,7 +1,6 @@
 #ifndef __SUBWAY_CARD_H__
 #define __SUBWAY_CARD_H__
 #include "subwayError.h"
-//#include "list.h"
 
 //最多允许系统开100张地铁卡
 #define MAX_CARD_NUM 100
@@ -22,7 +21,7 @@ struct ST_SUBWAY_CARD
 {
     EN_CARD_TYPE enCard;  //卡类型
     unsigned int cardNo;       //卡号
-    bool usrFlag;             //卡是否启用
+    int usrFlag;             //卡是否启用
     unsigned int balance;       //卡余额
 };
 

@@ -8,7 +8,6 @@
 #include "subwayPrice.h"
 #include "subwayCommon.h"
 #include "subwayOutput.h"
-#include "subwayError.h"
 using namespace std;
 
 /*
@@ -19,9 +18,9 @@ using namespace std;
 */
 void ProcQueryLineCmd(UN_CMD &unCmd, char returnStr[MAX_SEND_BUFFER_LENGTH])
 {
+	string res="";
+	GetLineInfo(res);
+	memcpy(returnStr,res.c_str(),MAX_SEND_BUFFER_LENGTH);
     //查询所有地铁线 GetLineInfo
-	string str;
-	GetLineInfo(str);
-	strcpy_s(returnStr,MAX_RECEIVE_BUFFER_LENGTH,str.data());
     return;
 }
