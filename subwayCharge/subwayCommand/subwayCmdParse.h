@@ -93,6 +93,8 @@ typedef union
     ST_CMD_SINGLE_TICKET stCmdSingleTicket;
     ST_CMD_CREATE_CARD stCmdCreateCard;
     ST_CMD_FILL_CHARGE stCmdFillCharge;
+	ST_CMD_DESTROY_CARD stCmdDestroyCard;
+	ST_CMD_QUERY_HIS stCmdQueryHis;
 }UN_CMD;
 
 //通用命令结构

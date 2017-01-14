@@ -26,7 +26,7 @@ CMD_PROC_FUNC g_cmdProcFuncList[EN_CMD_TYPE_BUTT] =
     ProcCreateSingleTicketCmd,//办理单程票--------------------
     ProcCreateCardCmd,//办理普通卡
     ProcFillChargeCmd,//充值命令
-    NULL,
+    ProcQueryHisCmd,//查询历史命令
     NULL,
     ProcQueryLineCmd,//查询地铁线-----------------------------
     ProcInvalidCmd,//无效命令处理

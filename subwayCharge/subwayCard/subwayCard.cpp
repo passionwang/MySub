@@ -1,14 +1,21 @@
 #include "stdafx.h"
 #include <iostream>
+#include <sstream>
 #include "list.h"
 #include "subwayGlobalDef.h"
 #include "subwayMacro.h"
 #include "subwayCard.h"
+#include "subwayCmdProc\include\subwayQueryHistoryProc.h"
+#include <CString>
 using namespace std;
 
 unsigned int g_CardNumNow = 0;//当前开卡数量
 unsigned int s_IndexNow = 0;//当前最大索引
 ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
+
+HistoryNode g_History[MAX_CARD_NUM][MAX_HISTORY];//所有卡的20条记录
+int g_HistoryIndex[MAX_CARD_NUM];       //记录的当前位置
+int g_HistoryNowHave[MAX_CARD_NUM];     //已经有的记录总数
 /*
 @ 初始化所有卡信息
 @ 返回值: 无
@@ -24,6 +31,11 @@ void InitCardManagerInfo()
 		G_cardList[i].usrFlag = 0;
 		G_cardList[i].enCard = EN_CARD_TYPE_BUTT;
     }
+	for(int i=0;i<MAX_CARD_NUM;++i)
+	{
+		g_HistoryIndex[i] = 0;       //记录的当前位置
+		g_HistoryNowHave[i] = 0;     //已经有的记录总数
+	}
 }
 
 /*
@@ -132,6 +144,10 @@ EN_RETURN_CODE DeductCard(unsigned int cardNo, EN_CARD_TYPE enCard, unsigned int
 		g_CardNumNow--;
 		balance=0;
 	}
+	else
+	{
+		balance=G_cardList[cardNo].balance;
+	}
     return EN_RETURN_SUCC;
 }
 
@@ -205,4 +221,113 @@ EN_RETURN_CODE GetCardType(char cardType[], EN_CARD_TYPE &enCard)
 		return EN_RETURN_SUCC;
 	}
     return EN_RETURN_INPUT_INVALID_CARDTYPE;
+}
+
+/*
+@ 设置的历史记录
+@ 入参：cardNo,卡ID;
+		enCard,卡类型 
+		enterTime,进站时间
+		exitTime,出站时间
+		enterStation,进站站点
+		exitStation,出站站点
+		money,消费金额
+@ 出参: 无
+@ 返回值: 无;
+*/
+void SetHistory(unsigned int cardNo,
+				EN_CARD_TYPE enCard,
+				ST_SUBWAY_TIME enterTime,
+				ST_SUBWAY_TIME exitTime,
+				char enterStation[MAX_STATION_NAME_LENGTH],
+				char exitStation[MAX_STATION_NAME_LENGTH],
+				unsigned int money)
+{
+
+	if(g_HistoryIndex[cardNo] >= MAX_HISTORY)
+	{
+		g_HistoryIndex[cardNo] = 0;
+	}
+	g_History[cardNo][g_HistoryIndex[cardNo]].cardNo = cardNo;
+	g_History[cardNo][g_HistoryIndex[cardNo]].enCard = enCard;
+	g_History[cardNo][g_HistoryIndex[cardNo]].enterTime = enterTime;
+	g_History[cardNo][g_HistoryIndex[cardNo]].exitTime = exitTime;
+	memcpy(g_History[cardNo][g_HistoryIndex[cardNo]].enterStation,enterStation,MAX_STATION_NAME_LENGTH);
+	memcpy(g_History[cardNo][g_HistoryIndex[cardNo]].exitStation,exitStation,MAX_STATION_NAME_LENGTH);
+	g_History[cardNo][g_HistoryIndex[cardNo]].money = money;
+	if(g_HistoryNowHave[cardNo] < MAX_HISTORY)	
+	{
+		++g_HistoryNowHave[cardNo];  
+	}
+	++g_HistoryIndex[cardNo];
+}
+/*
+@ 获取卡的历史记录
+@ 入参：cardNo,卡ID; 
+@ 出参: str,匹配后字符串
+@ 返回值: 无;
+*/
+void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH])
+{
+	int index = 1;
+	string strTemp;
+	char temp[10];
+	strTemp = "查询<成功><卡号=";
+	strTemp += itoa(cardNo,temp,10);
+	strTemp += "><卡类型=";
+	strTemp += GetCardTypeStr(g_History[cardNo][0].enCard);
+	strTemp += ">\r\n";
+
+	for(int i=g_HistoryIndex[cardNo];i<g_HistoryNowHave[cardNo];++i)
+	{
+		strTemp += "<序号=";
+		strTemp += itoa(index,temp,10);
+		++index;
+		strTemp += ",进站时间=";
+		strTemp += itoa(g_History[cardNo][i].enterTime.hour,temp,10);
+		strTemp += ":";
+		if(g_History[cardNo][i].enterTime.minutes<10)
+			strTemp += "0";
+		strTemp += itoa(g_History[cardNo][i].enterTime.minutes,temp,10);
+		strTemp += ",进站站点=";
+		strTemp += g_History[cardNo][i].enterStation;
+		strTemp += ",出站时间=";
+		strTemp += itoa(g_History[cardNo][i].exitTime.hour,temp,10);
+		strTemp += ":";
+		if(g_History[cardNo][i].exitTime.minutes<10)
+			strTemp += "0";
+		strTemp += itoa(g_History[cardNo][i].exitTime.minutes,temp,10);
+		strTemp += ",出站站点=";
+		strTemp += g_History[cardNo][i].exitStation;
+		strTemp += ",消费金额=";
+		strTemp += itoa(g_History[cardNo][i].money,temp,10);
+		strTemp += ">\r\n";
+	}
+	for(int i=0;i<g_HistoryIndex[cardNo];++i)
+	{
+		strTemp += "<序号=";
+		strTemp += itoa(index,temp,10);
+		++index;
+		strTemp += ",进站时间=";
+		strTemp += itoa(g_History[cardNo][i].enterTime.hour,temp,10);
+		strTemp += ":";
+		if(g_History[cardNo][i].enterTime.minutes<10)
+			strTemp += "0";
+		strTemp += itoa(g_History[cardNo][i].enterTime.minutes,temp,10);
+		strTemp += ",进站站点=";
+		strTemp += g_History[cardNo][i].enterStation;
+		strTemp += ",出站时间=";
+		strTemp += itoa(g_History[cardNo][i].exitTime.hour,temp,10);
+		strTemp += ":";
+		if(g_History[cardNo][i].exitTime.minutes<10)
+			strTemp += "0";
+		strTemp += itoa(g_History[cardNo][i].exitTime.minutes,temp,10);
+		strTemp += ",出站站点=";
+		strTemp += g_History[cardNo][i].exitStation;
+		strTemp += ",消费金额=";
+		strTemp += itoa(g_History[cardNo][i].money,temp,10);
+		strTemp += ">\r\n";
+	}
+	memcpy(str,strTemp.c_str(),MAX_SEND_BUFFER_LENGTH);
+
 }

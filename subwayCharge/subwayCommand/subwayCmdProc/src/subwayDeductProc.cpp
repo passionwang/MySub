@@ -65,6 +65,18 @@ void ProcDeductCmd(UN_CMD &unCmd, char returnStr[MAX_SEND_BUFFER_LENGTH])
         GetOutputResultStr(EN_CMD_TYPE_DEDUCT, returnCode, unCmd.stCmdDeduct.cardNo, enCard, balance, returnStr);
         return;
     }
+	//判断非单程卡记录
+	if(enCard != EN_CARD_TYPE_SINGLE)
+	{   //记录行车记录
+		SetHistory(unCmd.stCmdDeduct.cardNo,
+					enCard,
+					unCmd.stCmdDeduct.enterTime,
+					unCmd.stCmdDeduct.exitTime,
+					unCmd.stCmdDeduct.enterStation,
+					unCmd.stCmdDeduct.exitStation,
+					deductPrice);
+	}
+	
     //输出字符串
     if(balance < 20 && enCard != EN_CARD_TYPE_SINGLE)
     {

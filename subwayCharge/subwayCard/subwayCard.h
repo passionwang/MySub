@@ -1,9 +1,12 @@
 #ifndef __SUBWAY_CARD_H__
 #define __SUBWAY_CARD_H__
 #include "subwayError.h"
+#include "subwayGlobalDef.h"
 
 //最多允许系统开100张地铁卡
 #define MAX_CARD_NUM 100
+#define MAX_STATION_NAME_LENGTH 32//名字长度
+#define MAX_HISTORY 20
 
 //最大余额值
 #define MAX_BALANCE 999
@@ -20,9 +23,9 @@ typedef enum
 struct ST_SUBWAY_CARD
 {
     EN_CARD_TYPE enCard;  //卡类型
-    unsigned int cardNo;       //卡号
-    int usrFlag;             //卡是否启用
-    unsigned int balance;       //卡余额
+    unsigned int cardNo;  //卡号
+    int usrFlag;          //卡是否启用
+    unsigned int balance; //卡余额
 };
 
 //ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
@@ -92,5 +95,33 @@ int DeleteCard(unsigned int cardNo);
 @ 返回值: 卡类型字符串，比如"普通卡";
 */
 char* GetCardTypeStr(EN_CARD_TYPE enCard);
+
+/*
+@ 设置的历史记录
+@ 入参：cardNo,卡ID;
+		enCard,卡类型 
+		enterTime,进站时间
+		exitTime,出站时间
+		enterStation,进站站点
+		exitStation,出站站点
+		money,消费金额
+@ 出参: 无
+@ 返回值: 无;
+*/
+void SetHistory(unsigned int cardNo,
+				EN_CARD_TYPE enCard,
+				ST_SUBWAY_TIME enterTime,
+				ST_SUBWAY_TIME exitTime,
+				char enterStation[MAX_STATION_NAME_LENGTH],
+				char exitStation[MAX_STATION_NAME_LENGTH],
+				unsigned int money);
+
+/*
+@ 获取卡的历史记录
+@ 入参：cardNo,卡ID; 
+@ 出参: str,匹配后字符串
+@ 返回值: 无;
+*/
+void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH]);
 
 #endif
