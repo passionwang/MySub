@@ -13,8 +13,10 @@
 
 using namespace std;
 
+
+
 /*
-@ 输出结果显示
+@ 输出错误结果显示
 @ 入参：stCmdDeduct, 命令内容
 @ 出参: returnStr
 @ 返回值: void
@@ -47,6 +49,88 @@ void GetOutputStr(EN_CMD_TYPE enCmd, EN_RETURN_CODE enResult, unsigned int cardN
 }
 
 /*
+@ 输出正确结果显示
+@ 入参：stCmdDeduct, 命令内容
+@ 出参: returnStr
+@ 返回值: void
+*/
+void Output(int cardNo,HistoryNode History[MAX_HISTORY],int HistoryIndex,int HistoryNowHave,char str[MAX_SEND_BUFFER_LENGTH])
+{
+	int index = 1;
+	string strTemp;
+	char temp[10];
+	strTemp = "查询<成功><卡号=";
+	_itoa_s(cardNo,temp,10,10);
+	strTemp += temp;
+	strTemp += "><卡类型=";
+	strTemp += GetCardTypeStr(History[0].enCard);
+	strTemp += ">\r\n";
+
+	for(int i=HistoryIndex;i<HistoryNowHave;++i)
+	{
+		strTemp += "<序号=";
+		_itoa_s(index,temp,10);
+		strTemp += temp;
+		++index;
+		strTemp += ",进站时间=";
+		_itoa_s(History[i].enterTime.hour,temp,10);
+		strTemp += temp;
+		strTemp += ":";
+		if(History[i].enterTime.minutes<10)
+			strTemp += "0";
+		_itoa_s(History[i].enterTime.minutes,temp,10);
+		strTemp += temp;
+		strTemp += ",进站站点=";
+		strTemp += History[i].enterStation;
+		strTemp += ",出站时间=";
+		_itoa_s(History[i].exitTime.hour,temp,10);
+		strTemp += temp;
+		strTemp += ":";
+		if(History[i].exitTime.minutes<10)
+			strTemp += "0";
+		_itoa_s(History[i].exitTime.minutes,temp,10);
+		strTemp += temp;
+		strTemp += ",出站站点=";
+		strTemp += History[i].exitStation;
+		strTemp += ",消费金额=";
+		_itoa_s(History[i].money,temp,10);
+		strTemp += temp;
+		strTemp += ">\r\n";
+	}
+	for(int i=0;i<HistoryIndex;++i)
+	{
+		strTemp += "<序号=";
+		_itoa_s(index,temp,10);
+		strTemp += temp;
+		++index;
+		strTemp += ",进站时间=";
+		_itoa_s(History[i].enterTime.hour,temp,10);
+		strTemp += temp;
+		strTemp += ":";
+		if(History[i].enterTime.minutes<10)
+			strTemp += "0";
+		_itoa_s(History[i].enterTime.minutes,temp,10);
+		strTemp += temp;
+		strTemp += ",进站站点=";
+		strTemp += History[i].enterStation;
+		strTemp += ",出站时间=";
+		_itoa_s(History[i].exitTime.hour,temp,10);
+		strTemp += temp;
+		strTemp += ":";
+		if(History[i].exitTime.minutes<10)
+			strTemp += "0";
+		_itoa_s(History[i].exitTime.minutes,temp,10);
+		strTemp += temp;
+		strTemp += ",出站站点=";
+		strTemp += History[i].exitStation;
+		strTemp += ",消费金额=";
+		_itoa_s(History[i].money,temp,10);
+		strTemp += temp;
+		strTemp += ">\r\n";
+	}
+	memcpy(str,strTemp.c_str(),MAX_SEND_BUFFER_LENGTH);
+}
+/*
 @ 查询历史命令
 @ 入参：stCmdDeduct, 命令内容
 @ 出参: returnStr
@@ -70,8 +154,14 @@ void ProcQueryHisCmd(UN_CMD &unCmd, char returnStr[MAX_SEND_BUFFER_LENGTH])
 		return;
 	}
 	//3.查询信息
-	GetHistory(unCmd.stCmdQueryHis.cardNo,returnStr);
-    return;
+	HistoryNode History[MAX_HISTORY];//所有卡的20条记录
+	int HistoryIndex;       //记录的当前位置
+	int HistoryNowHave;     //已经有的记录总数
+	GetHistory(unCmd.stCmdQueryHis.cardNo,History,HistoryIndex,HistoryNowHave);
+    Output(unCmd.stCmdQueryHis.cardNo,History,HistoryIndex,HistoryNowHave,returnStr);
+	return;
 }
+
+
 
 

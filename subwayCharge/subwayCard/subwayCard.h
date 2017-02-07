@@ -128,6 +128,6 @@ void SetHistory(unsigned int cardNo,
 @ 出参: str,匹配后字符串
 @ 返回值: 无;
 */
-void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH]);
+void GetHistory(int cardNo,HistoryNode History[MAX_HISTORY],int& HistoryIndex,int& HistoryNowHave);
 
 #endif

@@ -4,7 +4,6 @@
 #include "list.h"
 #include "subwayMacro.h"
 #include "subwayCard.h"
-//#include "subwayCmdProc\include\subwayQueryHistoryProc.h"
 #include <CString>
 using namespace std;
 
@@ -265,79 +264,13 @@ void SetHistory(unsigned int cardNo,
 @ 出参: str,匹配后字符串
 @ 返回值: 无;
 */
-void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH])
+void GetHistory(int cardNo,HistoryNode History[MAX_HISTORY],int& HistoryIndex,int& HistoryNowHave)
 {
-	int index = 1;
-	string strTemp;
-	char temp[10];
-	strTemp = "查询<成功><卡号=";
-	_itoa_s(cardNo,temp,10,10);
-	strTemp += temp;
-	strTemp += "><卡类型=";
-	strTemp += GetCardTypeStr(g_History[cardNo][0].enCard);
-	strTemp += ">\r\n";
+	HistoryIndex = g_HistoryIndex[cardNo];
+	HistoryNowHave = g_HistoryNowHave[cardNo];
 
-	for(int i=g_HistoryIndex[cardNo];i<g_HistoryNowHave[cardNo];++i)
+	for(int i=0;i<MAX_HISTORY;++i)
 	{
-		strTemp += "<序号=";
-		_itoa_s(index,temp,10);
-		strTemp += temp;
-		++index;
-		strTemp += ",进站时间=";
-		_itoa_s(g_History[cardNo][i].enterTime.hour,temp,10);
-		strTemp += temp;
-		strTemp += ":";
-		if(g_History[cardNo][i].enterTime.minutes<10)
-			strTemp += "0";
-		_itoa_s(g_History[cardNo][i].enterTime.minutes,temp,10);
-		strTemp += temp;
-		strTemp += ",进站站点=";
-		strTemp += g_History[cardNo][i].enterStation;
-		strTemp += ",出站时间=";
-		_itoa_s(g_History[cardNo][i].exitTime.hour,temp,10);
-		strTemp += temp;
-		strTemp += ":";
-		if(g_History[cardNo][i].exitTime.minutes<10)
-			strTemp += "0";
-		_itoa_s(g_History[cardNo][i].exitTime.minutes,temp,10);
-		strTemp += temp;
-		strTemp += ",出站站点=";
-		strTemp += g_History[cardNo][i].exitStation;
-		strTemp += ",消费金额=";
-		_itoa_s(g_History[cardNo][i].money,temp,10);
-		strTemp += temp;
-		strTemp += ">\r\n";
+		History[i] = g_History[cardNo][i];
 	}
-	for(int i=0;i<g_HistoryIndex[cardNo];++i)
-	{
-		strTemp += "<序号=";
-		_itoa_s(index,temp,10);
-		strTemp += temp;
-		++index;
-		strTemp += ",进站时间=";
-		_itoa_s(g_History[cardNo][i].enterTime.hour,temp,10);
-		strTemp += temp;
-		strTemp += ":";
-		if(g_History[cardNo][i].enterTime.minutes<10)
-			strTemp += "0";
-		_itoa_s(g_History[cardNo][i].enterTime.minutes,temp,10);
-		strTemp += temp;
-		strTemp += ",进站站点=";
-		strTemp += g_History[cardNo][i].enterStation;
-		strTemp += ",出站时间=";
-		_itoa_s(g_History[cardNo][i].exitTime.hour,temp,10);
-		strTemp += temp;
-		strTemp += ":";
-		if(g_History[cardNo][i].exitTime.minutes<10)
-			strTemp += "0";
-		_itoa_s(g_History[cardNo][i].exitTime.minutes,temp,10);
-		strTemp += temp;
-		strTemp += ",出站站点=";
-		strTemp += g_History[cardNo][i].exitStation;
-		strTemp += ",消费金额=";
-		_itoa_s(g_History[cardNo][i].money,temp,10);
-		strTemp += temp;
-		strTemp += ">\r\n";
-	}
-	memcpy(str,strTemp.c_str(),MAX_SEND_BUFFER_LENGTH);
 }
