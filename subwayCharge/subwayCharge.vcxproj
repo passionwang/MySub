@@ -107,6 +107,9 @@
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="subwayCard\subwayCard.h" />
+    <ClInclude Include="subwayCard\subwayCard1.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="subwayCommand\subwayCmdParse\include\cmdCreateCard.h" />
     <ClInclude Include="subwayCommand\subwayCmdParse\include\cmdDeductProc.h" />
     <ClInclude Include="subwayCommand\subwayCmdParse\include\cmdDestroyCard.h" />
@@ -141,6 +144,9 @@
   <ItemGroup>
     <ClCompile Include="stdafx.cpp" />
     <ClCompile Include="subwayCard\subwayCard.cpp" />
+    <ClCompile Include="subwayCard\subwayCard1.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="subwayCharge.cpp" />
     <ClCompile Include="subwayCommand\subwayCmdParse\src\cmdCreateCard.cpp" />
     <ClCompile Include="subwayCommand\subwayCmdParse\src\cmdDeductProc.cpp" />

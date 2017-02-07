@@ -3,7 +3,7 @@
 
 //Socket通信接收和发送缓存最大长度
 #define MAX_RECEIVE_BUFFER_LENGTH 1024
-#define MAX_SEND_BUFFER_LENGTH 1024
+#define MAX_SEND_BUFFER_LENGTH (1024*2)
 
 //地铁系统时间
 typedef struct

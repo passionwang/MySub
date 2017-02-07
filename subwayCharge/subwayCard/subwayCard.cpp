@@ -273,7 +273,8 @@ void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH])
 	string strTemp;
 	char temp[10];
 	strTemp = "查询<成功><卡号=";
-	strTemp += itoa(cardNo,temp,10);
+	_itoa_s(cardNo,temp,10,10);
+	strTemp += temp;
 	strTemp += "><卡类型=";
 	strTemp += GetCardTypeStr(g_History[cardNo][0].enCard);
 	strTemp += ">\r\n";
@@ -281,53 +282,64 @@ void GetHistory(int cardNo,char str[MAX_SEND_BUFFER_LENGTH])
 	for(int i=g_HistoryIndex[cardNo];i<g_HistoryNowHave[cardNo];++i)
 	{
 		strTemp += "<序号=";
-		strTemp += itoa(index,temp,10);
+		_itoa_s(index,temp,10);
+		strTemp += temp;
 		++index;
 		strTemp += ",进站时间=";
-		strTemp += itoa(g_History[cardNo][i].enterTime.hour,temp,10);
+		_itoa_s(g_History[cardNo][i].enterTime.hour,temp,10);
+		strTemp += temp;
 		strTemp += ":";
 		if(g_History[cardNo][i].enterTime.minutes<10)
 			strTemp += "0";
-		strTemp += itoa(g_History[cardNo][i].enterTime.minutes,temp,10);
+		_itoa_s(g_History[cardNo][i].enterTime.minutes,temp,10);
+		strTemp += temp;
 		strTemp += ",进站站点=";
 		strTemp += g_History[cardNo][i].enterStation;
 		strTemp += ",出站时间=";
-		strTemp += itoa(g_History[cardNo][i].exitTime.hour,temp,10);
+		_itoa_s(g_History[cardNo][i].exitTime.hour,temp,10);
+		strTemp += temp;
 		strTemp += ":";
 		if(g_History[cardNo][i].exitTime.minutes<10)
 			strTemp += "0";
-		strTemp += itoa(g_History[cardNo][i].exitTime.minutes,temp,10);
+		_itoa_s(g_History[cardNo][i].exitTime.minutes,temp,10);
+		strTemp += temp;
 		strTemp += ",出站站点=";
 		strTemp += g_History[cardNo][i].exitStation;
 		strTemp += ",消费金额=";
-		strTemp += itoa(g_History[cardNo][i].money,temp,10);
+		_itoa_s(g_History[cardNo][i].money,temp,10);
+		strTemp += temp;
 		strTemp += ">\r\n";
 	}
 	for(int i=0;i<g_HistoryIndex[cardNo];++i)
 	{
 		strTemp += "<序号=";
-		strTemp += itoa(index,temp,10);
+		_itoa_s(index,temp,10);
+		strTemp += temp;
 		++index;
 		strTemp += ",进站时间=";
-		strTemp += itoa(g_History[cardNo][i].enterTime.hour,temp,10);
+		_itoa_s(g_History[cardNo][i].enterTime.hour,temp,10);
+		strTemp += temp;
 		strTemp += ":";
 		if(g_History[cardNo][i].enterTime.minutes<10)
 			strTemp += "0";
-		strTemp += itoa(g_History[cardNo][i].enterTime.minutes,temp,10);
+		_itoa_s(g_History[cardNo][i].enterTime.minutes,temp,10);
+		strTemp += temp;
 		strTemp += ",进站站点=";
 		strTemp += g_History[cardNo][i].enterStation;
 		strTemp += ",出站时间=";
-		strTemp += itoa(g_History[cardNo][i].exitTime.hour,temp,10);
+		_itoa_s(g_History[cardNo][i].exitTime.hour,temp,10);
+		strTemp += temp;
 		strTemp += ":";
 		if(g_History[cardNo][i].exitTime.minutes<10)
 			strTemp += "0";
-		strTemp += itoa(g_History[cardNo][i].exitTime.minutes,temp,10);
+		_itoa_s(g_History[cardNo][i].exitTime.minutes,temp,10);
+		strTemp += temp;
 		strTemp += ",出站站点=";
 		strTemp += g_History[cardNo][i].exitStation;
 		strTemp += ",消费金额=";
-		strTemp += itoa(g_History[cardNo][i].money,temp,10);
+		_itoa_s(g_History[cardNo][i].money,temp,10);
+		strTemp += temp;
 		strTemp += ">\r\n";
 	}
 	memcpy(str,strTemp.c_str(),MAX_SEND_BUFFER_LENGTH);
-
 }
