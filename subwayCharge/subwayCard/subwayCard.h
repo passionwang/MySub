@@ -20,6 +20,17 @@ typedef enum
     EN_CARD_TYPE_BUTT
 }EN_CARD_TYPE;
 
+struct HistoryNode
+{
+	unsigned int cardNo;  //卡号
+	EN_CARD_TYPE enCard;  //卡类型
+	ST_SUBWAY_TIME enterTime;//进站时间
+	ST_SUBWAY_TIME exitTime;//出站时间
+	char enterStation[MAX_STATION_NAME_LENGTH];//进站站点
+	char exitStation[MAX_STATION_NAME_LENGTH];//出站站点
+	unsigned int money;  //消费金额
+};
+
 struct ST_SUBWAY_CARD
 {
     EN_CARD_TYPE enCard;  //卡类型
@@ -27,10 +38,6 @@ struct ST_SUBWAY_CARD
     int usrFlag;          //卡是否启用
     unsigned int balance; //卡余额
 };
-
-//ST_SUBWAY_CARD G_cardList[MAX_CARD_NUM];  //所有卡信息
-
-
 
 /*
 @ 初始化所有卡信息
@@ -45,7 +52,6 @@ void InitCardManagerInfo();
 @ 返回值: EN_RETURN_SUCC，分配成功; EN_RETURN_CARD_OVERLOW, 分配失败;
 */
 EN_RETURN_CODE AssignCard(unsigned int &cardNo, EN_CARD_TYPE enCard, unsigned int charge);
-
 
 /*
 @ 充值

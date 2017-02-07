@@ -2,10 +2,9 @@
 #include <iostream>
 #include <sstream>
 #include "list.h"
-#include "subwayGlobalDef.h"
 #include "subwayMacro.h"
 #include "subwayCard.h"
-#include "subwayCmdProc\include\subwayQueryHistoryProc.h"
+//#include "subwayCmdProc\include\subwayQueryHistoryProc.h"
 #include <CString>
 using namespace std;
 
@@ -243,7 +242,6 @@ void SetHistory(unsigned int cardNo,
 				char exitStation[MAX_STATION_NAME_LENGTH],
 				unsigned int money)
 {
-
 	if(g_HistoryIndex[cardNo] >= MAX_HISTORY)
 	{
 		g_HistoryIndex[cardNo] = 0;

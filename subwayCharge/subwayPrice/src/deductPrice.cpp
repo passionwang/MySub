@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "subwayGlobalDef.h"
 #include "subwayMacro.h"
-#include "include/basePrice.h"
-#include "include/deductPrice.h"
 #include "subwayPrice.h"
 #include <iostream>
 using namespace std;

@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include <iostream>
 #include  <sstream>
-#include "subwayMacro.h"
-#include "include/basePrice.h"
+//#include "subwayMacro.h"
 using namespace std;
 
 /*
